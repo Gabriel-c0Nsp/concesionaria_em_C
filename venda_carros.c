@@ -39,6 +39,7 @@ int login_vendedor(void);
 int login_cliente(void);
 void inserir_carro(Estoque *estoque, Carro carro);
 void exibir_estoque(Estoque estoque);
+void pesquisar_carro(Estoque estoque, char modelo[50]);
 
 // Função principal
 int main(void) {
@@ -95,6 +96,7 @@ void cadastrar_cliente(void) {
   do {
     printf("Realizar cadastro (1)\n");
     printf("Sair (0)\n");
+    printf("\n-->  ");
     scanf("%d", &opcao);
 
     if (opcao < 0 || opcao > 1) {
@@ -134,6 +136,7 @@ int login_vendedor(void) {
   do {
     printf("Entrar como vendedor (1)\n");
     printf("Sair (0)\n");
+    printf("\n-->  ");
     scanf("%d", &opcao);
 
     if (opcao < 0 || opcao > 1) {
@@ -168,6 +171,7 @@ int login_cliente(void) {
     printf("Inserir informações de cadastro (1)\n");
     printf("Criar cadastro (2)\n");
     printf("Sair (0)\n");
+    printf("\n-->  ");
     scanf("%d", &opcao);
 
     if (opcao == 1) {
@@ -216,6 +220,7 @@ void menu_vendedor(void) {
       printf("Exibir Clientes: (9)\n");
       printf("\n============ Sair ============\n");
       printf("Sair: (0)\n");
+      printf("\n-->  ");
       scanf("%d", &opcao);
 
       if (opcao < 0 || opcao > 9) {
@@ -233,6 +238,12 @@ void menu_vendedor(void) {
         scanf("%lf", &carro.preco);
 
         inserir_carro(&estoque, carro);
+      } else if (opcao == 2) {
+        char modelo[50];
+        printf("Insira o modelo do carro: ");
+        scanf("%s", modelo);
+
+        pesquisar_carro(estoque, modelo);
       } else if (opcao == 5) {
         exibir_estoque(estoque);
       } 
@@ -250,6 +261,7 @@ void menu_cliente(void) {
       printf("Pesquisar carros: (1)\n");
       printf("Comprar carro: (2)\n");
       printf("Sair: (0)\n");
+      printf("\n-->  ");
       scanf("%d", &opcao);
 
       if (opcao < 0 || opcao > 2) {
@@ -276,6 +288,25 @@ void exibir_estoque(Estoque estoque) {
     printf("Preço: %.2lf\n", estoque.carros_estoque[i].preco);
   }
 
+}
+
+void pesquisar_carro(Estoque estoque, char modelo[50]) {
+  clear_screen();
+
+  int achado = 0;
+
+  for (int i = 0; i < estoque.qtd_carros; i++) {
+    if (strcmp(modelo, estoque.carros_estoque[i].modelo) == 0) {
+      printf("\nModelo: %s\n", estoque.carros_estoque[i].modelo);
+      printf("Preço: %.2lf\n", estoque.carros_estoque[i].preco);
+
+      achado = 1;
+    }  
+  }
+
+  if (!achado) {
+    printf("Carro não encontrado!\n");
+  }
 }
 
 void clear_screen(void) {
