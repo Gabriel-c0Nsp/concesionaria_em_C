@@ -26,7 +26,10 @@ typedef struct {
   int qtd_carros;
 } Estoque;
 
+Estoque estoque;
+
 // Funções
+void clear_screen(void);
 void menu_principal(void);
 void menu_cliente(void);
 void menu_vendedor(void);
@@ -34,6 +37,8 @@ void cadastrar_cliente(void);
 int verificar_senha(char senha[200]);
 int login_vendedor(void);
 int login_cliente(void);
+void inserir_carro(Estoque *estoque, Carro carro);
+void exibir_estoque(Estoque estoque);
 
 // Função principal
 int main(void) {
@@ -198,7 +203,7 @@ void menu_vendedor(void) {
 
   if (login_vendedor()) {
     do {
-      printf("\n============ Referente ao estoque ============\n");
+      printf("\n\n============ Referente ao estoque ============\n");
       printf("Inserir carro: (1)\n");
       printf("Buscar carro: (2)\n");
       printf("Alterar carro: (3)\n");
@@ -216,9 +221,21 @@ void menu_vendedor(void) {
       if (opcao < 0 || opcao > 9) {
         valido = 0;
         printf("Não é uma opção válida! Tente novamente.\n");
-      } else {
-        valido = 1;
-      }
+      } else if (opcao == 0) {
+        printf("Saindo...\n");
+        return;
+      } else if (opcao == 1) {
+        Carro carro;
+
+        printf("Insira o modelo do carro: ");
+        scanf("%s", carro.modelo);
+        printf("Insira o preço do carro: ");
+        scanf("%lf", &carro.preco);
+
+        inserir_carro(&estoque, carro);
+      } else if (opcao == 5) {
+        exibir_estoque(estoque);
+      } 
 
     } while (!valido);
   }
@@ -244,4 +261,27 @@ void menu_cliente(void) {
 
     } while (!valido);
   }
+}
+
+void inserir_carro(Estoque *estoque, Carro carro) {
+  estoque->carros_estoque[estoque->qtd_carros] = carro;
+  estoque->qtd_carros++;
+}
+
+void exibir_estoque(Estoque estoque) {
+  clear_screen();
+
+  for (int i = 0; i < estoque.qtd_carros; i++) {
+    printf("\nModelo: %s\n", estoque.carros_estoque[i].modelo);
+    printf("Preço: %.2lf\n", estoque.carros_estoque[i].preco);
+  }
+
+}
+
+void clear_screen(void) {
+#ifdef _WIN32
+  system("cls");
+#else
+  system("clear");
+#endif
 }
