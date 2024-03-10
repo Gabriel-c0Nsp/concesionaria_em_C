@@ -40,15 +40,11 @@ int login_cliente(void);
 void inserir_carro(Estoque *estoque, Carro carro);
 void exibir_estoque(Estoque estoque);
 void pesquisar_carro(Estoque estoque, char modelo[50]);
+int excluir_carro(Estoque *estoque, char modelo[50]);
 
 // Função principal
 int main(void) {
-
-#ifdef _WIN32
-  system("cls");
-#else
-  system("clear");
-#endif
+  clear_screen();
 
   menu_principal();
 
@@ -113,7 +109,6 @@ void cadastrar_cliente(void) {
     printf("Escolha uma senha: ");
     scanf("%s", senha);
   }
-
 }
 
 int verificar_senha(char senha[200]) {  
@@ -138,6 +133,7 @@ int login_vendedor(void) {
     printf("Sair (0)\n");
     printf("\n-->  ");
     scanf("%d", &opcao);
+    clear_screen();
 
     if (opcao < 0 || opcao > 1) {
       valido = 0;
@@ -236,6 +232,7 @@ void menu_vendedor(void) {
         scanf("%s", carro.modelo);
         printf("Insira o preço do carro: ");
         scanf("%lf", &carro.preco);
+        clear_screen();
 
         inserir_carro(&estoque, carro);
       } else if (opcao == 2) {
@@ -244,6 +241,19 @@ void menu_vendedor(void) {
         scanf("%s", modelo);
 
         pesquisar_carro(estoque, modelo);
+      } else if (opcao == 4) {
+        char modelo[50];
+
+        printf("Insira o nome do modelo do carro que deseja excluir: ");
+        scanf("%s", modelo);
+
+        if (excluir_carro(&estoque, modelo)) {
+          printf("Carro excluído com sucesso!\n");
+        } else {
+          printf("Carro não encontrado!\n");
+        }
+
+        excluir_carro(&estoque, modelo);
       } else if (opcao == 5) {
         exibir_estoque(estoque);
       } 
@@ -283,11 +293,18 @@ void inserir_carro(Estoque *estoque, Carro carro) {
 void exibir_estoque(Estoque estoque) {
   clear_screen();
 
+  int achado = 0;
+
   for (int i = 0; i < estoque.qtd_carros; i++) {
     printf("\nModelo: %s\n", estoque.carros_estoque[i].modelo);
-    printf("Preço: %.2lf\n", estoque.carros_estoque[i].preco);
+    printf("Preço: R$%.2lf\n", estoque.carros_estoque[i].preco);
+
+    achado = 1;
   }
 
+  if (achado == 0) {
+    printf("Não há carros no estoque\n");
+  }
 }
 
 void pesquisar_carro(Estoque estoque, char modelo[50]) {
@@ -307,6 +324,21 @@ void pesquisar_carro(Estoque estoque, char modelo[50]) {
   if (!achado) {
     printf("Carro não encontrado!\n");
   }
+}
+
+int excluir_carro(Estoque *estoque, char modelo[50]) {
+  int achado = 0;
+
+  for (int i = 0; i < estoque->qtd_carros; i++) {
+    if (strcmp(modelo, estoque->carros_estoque[i].modelo) == 0) {
+      for (int j = i; j < estoque->qtd_carros; j++) {
+        estoque->carros_estoque[j] = estoque->carros_estoque[j + 1];
+      }
+      estoque->qtd_carros--;
+      achado = 1;
+    }
+  }
+  return achado;
 }
 
 void clear_screen(void) {
