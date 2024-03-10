@@ -41,6 +41,7 @@ void inserir_carro(Estoque *estoque, Carro carro);
 void exibir_estoque(Estoque estoque);
 void pesquisar_carro(Estoque estoque, char modelo[50]);
 int excluir_carro(Estoque *estoque, char modelo[50]);
+void alterar_carro(Estoque *estoque, char modelo[50]);
 
 // Função principal
 int main(void) {
@@ -49,7 +50,6 @@ int main(void) {
   menu_principal();
 
   return 0;
-
 }
 
 void menu_principal(void) {
@@ -154,6 +154,8 @@ int login_vendedor(void) {
     }
 
   } while (!valido);
+
+  clear_screen();
   return valido;
 }
 
@@ -241,6 +243,13 @@ void menu_vendedor(void) {
         scanf("%s", modelo);
 
         pesquisar_carro(estoque, modelo);
+      } else if (opcao == 3) {
+        char modelo[50];
+
+        printf("Insira o nome do modelo do carro que deseja alterar: ");
+        scanf("%s", modelo);
+
+        alterar_carro(&estoque, modelo);
       } else if (opcao == 4) {
         char modelo[50];
 
@@ -285,6 +294,7 @@ void menu_cliente(void) {
   }
 }
 
+// Adiciona um carro no estoque
 void inserir_carro(Estoque *estoque, Carro carro) {
   estoque->carros_estoque[estoque->qtd_carros] = carro;
   estoque->qtd_carros++;
@@ -307,6 +317,7 @@ void exibir_estoque(Estoque estoque) {
   }
 }
 
+// Buscar carro
 void pesquisar_carro(Estoque estoque, char modelo[50]) {
   clear_screen();
 
@@ -326,21 +337,45 @@ void pesquisar_carro(Estoque estoque, char modelo[50]) {
   }
 }
 
+// Exclusão de carro por parte do vendedor
 int excluir_carro(Estoque *estoque, char modelo[50]) {
   int achado = 0;
 
-  for (int i = 0; i < estoque->qtd_carros; i++) {
-    if (strcmp(modelo, estoque->carros_estoque[i].modelo) == 0) {
-      for (int j = i; j < estoque->qtd_carros; j++) {
+  for (int i = 0; i < estoque -> qtd_carros; i++) {
+    if (strcmp(modelo, estoque -> carros_estoque[i].modelo) == 0) {
+      for (int j = i; j < estoque -> qtd_carros; j++) {
         estoque->carros_estoque[j] = estoque->carros_estoque[j + 1];
       }
-      estoque->qtd_carros--;
+      estoque -> qtd_carros--;
       achado = 1;
     }
   }
   return achado;
 }
 
+void alterar_carro(Estoque *estoque, char modelo[50]) {
+  int achado = 0;
+
+  for (int i = 0; i < estoque -> qtd_carros; i++) {
+    if (strcmp(modelo, estoque -> carros_estoque[i].modelo) == 0) {
+      printf("Insira o novo modelo do carro: ");
+      scanf("%s", estoque -> carros_estoque[i].modelo);
+      printf("Insira o novo preço do carro: ");
+      scanf("%lf", &estoque -> carros_estoque[i].preco);
+      achado = 1;
+
+      clear_screen();
+      printf("Carro alterado com sucesso!\n");
+    }
+  }
+
+  if (!achado) {
+    clear_screen();
+    printf("Carro não encontrado!\n");
+  }
+}
+
+// Função para limpar a tela independente do sistema operacional 
 void clear_screen(void) {
 #ifdef _WIN32
   system("cls");
