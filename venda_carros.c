@@ -43,6 +43,7 @@ void exibir_estoque(Estoque estoque);
 void pesquisar_carro(Estoque estoque, char modelo[50]);
 int excluir_carro(Estoque *estoque, char modelo[50]);
 void alterar_carro(Estoque *estoque, char modelo[50]);
+void exibir_clientes(void);
 
 // Função principal
 int main(void) {
@@ -117,7 +118,7 @@ void cadastrar_cliente(void) {
     strcpy(clientes[qtd_clientes - 1].senha, senha);
 
     clear_screen();
-    printf("Cadastro realizado com sucesso!\n");
+    printf("Cadastro realizado com sucesso!\n\n");
 
     menu_principal();
   } else if (opcao == 0) {
@@ -285,6 +286,8 @@ void menu_vendedor(void) {
         excluir_carro(&estoque, modelo);
       } else if (opcao == 5) {
         exibir_estoque(estoque);
+      } else if (opcao == 9) {
+        exibir_clientes();
       } 
 
     } while (!valido);
@@ -305,6 +308,14 @@ void menu_cliente(void) {
     if (opcao < 0 || opcao > 2) {
       valido = 0;
       printf("Não é uma opção válida! Tente novamente.\n");
+    } else if (opcao == 1) {
+      char modelo[50];
+
+      printf("Insira o modelo do carro que deseja pesquisar: ");
+      scanf("%s", modelo);
+
+      pesquisar_carro(estoque, modelo);
+      printf("\n\n");
     } else {
       valido = 1;
     }
@@ -314,8 +325,8 @@ void menu_cliente(void) {
 
 // Adiciona um carro no estoque
 void inserir_carro(Estoque *estoque, Carro carro) {
-  estoque->carros_estoque[estoque->qtd_carros] = carro;
-  estoque->qtd_carros++;
+  estoque -> carros_estoque[estoque -> qtd_carros] = carro;
+  estoque -> qtd_carros++;
 }
 
 void exibir_estoque(Estoque estoque) {
@@ -362,7 +373,7 @@ int excluir_carro(Estoque *estoque, char modelo[50]) {
   for (int i = 0; i < estoque -> qtd_carros; i++) {
     if (strcmp(modelo, estoque -> carros_estoque[i].modelo) == 0) {
       for (int j = i; j < estoque -> qtd_carros; j++) {
-        estoque->carros_estoque[j] = estoque->carros_estoque[j + 1];
+        estoque -> carros_estoque[j] = estoque -> carros_estoque[j + 1];
       }
       estoque -> qtd_carros--;
       achado = 1;
@@ -391,6 +402,16 @@ void alterar_carro(Estoque *estoque, char modelo[50]) {
     clear_screen();
     printf("Carro não encontrado!\n");
   }
+}
+
+void exibir_clientes(void) {
+  clear_screen();
+
+  printf("CLIENTES CADASTRADOS:\n");
+
+  for (int i = 0; i < qtd_clientes; i++) {
+    printf("Nome: %s\n", clientes[i].nome);
+  } 
 }
 
 // Função para limpar a tela independente do sistema operacional 
