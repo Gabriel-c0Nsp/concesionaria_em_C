@@ -44,6 +44,7 @@ void pesquisar_carro(Estoque estoque, char modelo[50]);
 int excluir_carro(Estoque *estoque, char modelo[50]);
 void alterar_carro(Estoque *estoque, char modelo[50]);
 void exibir_clientes(void);
+void excluir_cliente(void);
 
 // Função principal
 int main(void) {
@@ -59,7 +60,8 @@ void menu_principal(void) {
   int valido = 0;
 
   do {
-    printf("Insira o tipo de usuário [(1) Cliente, (2) Vendedor, (0) Sair]: ");
+    printf("Insira o tipo de usuário: \n(1) Cliente \n(2) Vendedor \n(0) Sair\n");
+    printf("\n-->  ");
     scanf("%d", &tipo_usuario);
     clear_screen();
     
@@ -284,6 +286,8 @@ void menu_vendedor(void) {
         }
 
         excluir_carro(&estoque, modelo);
+      } else if (opcao == 8) {
+        excluir_cliente();
       } else if (opcao == 5) {
         exibir_estoque(estoque);
       } else if (opcao == 9) {
@@ -404,6 +408,7 @@ void alterar_carro(Estoque *estoque, char modelo[50]) {
   }
 }
 
+// Lista os clientes cadastrados
 void exibir_clientes(void) {
   clear_screen();
 
@@ -412,6 +417,32 @@ void exibir_clientes(void) {
   for (int i = 0; i < qtd_clientes; i++) {
     printf("Nome: %s\n", clientes[i].nome);
   } 
+}
+
+void excluir_cliente(void) {
+  char nome[50];
+  int achado = 0;
+
+  printf("Insira o nome do cliente que deseja excluir: ");
+  scanf("%s", nome);
+
+  clear_screen();
+
+  for (int i = 0; i < qtd_clientes; i++) {
+    if (strcmp(nome, clientes[i].nome) == 0) {
+      for (int j = i; j < qtd_clientes; j++) {
+        clientes[j] = clientes[j + 1];
+      }
+      qtd_clientes--;
+      achado = 1;
+    }
+  }
+
+  if (achado) {
+    printf("Cliente excluído com sucesso!\n");
+  } else {
+    printf("Cliente não encontrado!\n");
+  }
 }
 
 // Função para limpar a tela independente do sistema operacional 
