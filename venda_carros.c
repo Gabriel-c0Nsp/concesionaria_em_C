@@ -10,15 +10,16 @@ typedef struct {
 
 typedef struct {
   char nome[50];
-  char senha[100];
+  char senha[200];
 } Cliente;
 
 Cliente clientes[200];
+int qtd_clientes = 0;
 
 typedef struct {
   Carro carros_vendidos[200];
   char nome[50];
-  char senha[100];
+  char senha[200];
 } Vendedor;
 
 typedef struct {
@@ -34,9 +35,9 @@ void menu_principal(void);
 void menu_cliente(void);
 void menu_vendedor(void);
 void cadastrar_cliente(void);
-int verificar_senha(char senha[200]);
+int verificar_dados(char nome[50], char senha[200]);
 int login_vendedor(void);
-int login_cliente(void);
+void login_cliente(void);
 void inserir_carro(Estoque *estoque, Carro carro);
 void exibir_estoque(Estoque estoque);
 void pesquisar_carro(Estoque estoque, char modelo[50]);
@@ -59,6 +60,7 @@ void menu_principal(void) {
   do {
     printf("Insira o tipo de usuário [(1) Cliente, (2) Vendedor, (0) Sair]: ");
     scanf("%d", &tipo_usuario);
+    clear_screen();
     
     if (tipo_usuario < 0 || tipo_usuario > 2) {
       valido = 0;
@@ -71,7 +73,7 @@ void menu_principal(void) {
 
   switch (tipo_usuario) {
     case 1:
-      menu_cliente();
+      login_cliente();
       break;
     case 2:
       menu_vendedor();
@@ -84,14 +86,14 @@ void menu_principal(void) {
 
 void cadastrar_cliente(void) {
   char nome[50];
-  char senha [200];
+  char senha[200];
 
   int opcao = 0;
   int valido = 0;
 
   do {
     printf("Realizar cadastro (1)\n");
-    printf("Sair (0)\n");
+    printf("Voltar (0)\n");
     printf("\n-->  ");
     scanf("%d", &opcao);
 
@@ -105,22 +107,38 @@ void cadastrar_cliente(void) {
 
   if (opcao == 1) {
     printf("Insira o seu nome: ");
-    scanf("%s", nome);
+    scanf("%49s", nome);
     printf("Escolha uma senha: ");
-    scanf("%s", senha);
+    scanf("%199s", senha); 
+    qtd_clientes++;
+
+    // Armazena o novo cliente no array clientes
+    strcpy(clientes[qtd_clientes - 1].nome, nome);
+    strcpy(clientes[qtd_clientes - 1].senha, senha);
+
+    clear_screen();
+    printf("Cadastro realizado com sucesso!\n");
+
+    menu_principal();
+  } else if (opcao == 0) {
+    clear_screen();
+    login_cliente();
   }
 }
 
-int verificar_senha(char senha[200]) {  
-  for (int i = 0; i < 200; i++) {
-    if (strcmp(senha, clientes[i].senha) == 0) {
-      return 1;
-    } else {
-      return 0;
+int verificar_dados(char nome[50], char senha[200]) {
+  int achado = 0;
+
+  for (int i = 0; i < qtd_clientes; i++) {
+    if (strcmp(nome, clientes[i].nome) == 0 && strcasecmp(senha, clientes[i].senha) == 0) {
+      achado = 1;
+      break;
     }
   }
-  return 0;
+
+  return achado;
 }
+
 
 int login_vendedor(void) {
   int opcao = 0;
@@ -150,7 +168,7 @@ int login_vendedor(void) {
       }
     } else if (opcao == 0) {
       printf("Saindo...\n");
-      return 0;
+      menu_principal();
     }
 
   } while (!valido);
@@ -159,10 +177,11 @@ int login_vendedor(void) {
   return valido;
 }
 
-int login_cliente(void) {
+void login_cliente(void) {
   int opcao = 0;
   int valido = 0;
 
+  char nome[50];
   char senha[200];
 
   do {
@@ -173,30 +192,31 @@ int login_cliente(void) {
     scanf("%d", &opcao);
 
     if (opcao == 1) {
+      printf("Insira o seu nome: ");
+      scanf("%s", nome);
       printf("Insira a sua senha: ");
       scanf("%s", senha);
-      verificar_senha(senha);
+      if (verificar_dados(nome, senha)) {
+        clear_screen();
+        printf("Login realizado com sucesso!\n");
+        menu_cliente();
+      } else {
+        printf("Senha incorreta! Tente novamente.\n");
+        menu_principal();
+      }
       valido = 1;
     } else if (opcao == 2) {
       cadastrar_cliente();
       valido = 1;
     } else if (opcao == 0) {
       printf("Saindo...\n");
-      return 0;
+      menu_principal();
     } else {
-      valido = 0;
       printf("Não é uma opção válida! Tente novamente.\n");
-    }
-
-    if (opcao < 0 || opcao > 2) {
       valido = 0;
-      printf("Não é uma opção válida! Tente novamente.\n");
-    } else {
-      valido = 1;
     }
 
   } while (!valido);
-  return valido;
 }
 
 void menu_vendedor(void) {
@@ -226,7 +246,7 @@ void menu_vendedor(void) {
         printf("Não é uma opção válida! Tente novamente.\n");
       } else if (opcao == 0) {
         printf("Saindo...\n");
-        return;
+        menu_principal();
       } else if (opcao == 1) {
         Carro carro;
 
@@ -275,23 +295,21 @@ void menu_cliente(void) {
   int opcao = 0;
   int valido = 0;
 
-  if (login_cliente()) {
-    do {
-      printf("Pesquisar carros: (1)\n");
-      printf("Comprar carro: (2)\n");
-      printf("Sair: (0)\n");
-      printf("\n-->  ");
-      scanf("%d", &opcao);
+  do {
+    printf("Pesquisar carros: (1)\n");
+    printf("Comprar carro: (2)\n");
+    printf("Sair: (0)\n");
+    printf("\n-->  ");
+    scanf("%d", &opcao);
 
-      if (opcao < 0 || opcao > 2) {
-        valido = 0;
-        printf("Não é uma opção válida! Tente novamente.\n");
-      } else {
-        valido = 1;
-      }
+    if (opcao < 0 || opcao > 2) {
+      valido = 0;
+      printf("Não é uma opção válida! Tente novamente.\n");
+    } else {
+      valido = 1;
+    }
 
-    } while (!valido);
-  }
+  } while (!valido);
 }
 
 // Adiciona um carro no estoque
