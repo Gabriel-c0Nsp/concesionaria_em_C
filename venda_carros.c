@@ -80,7 +80,7 @@ void menu_principal(void) {
       break;
     case 0:
       printf("Saindo...\n");
-      break;
+      exit(0);
   }
 }
 
@@ -198,7 +198,7 @@ void login_cliente(void) {
       scanf("%s", senha);
       if (verificar_dados(nome, senha)) {
         clear_screen();
-        printf("Login realizado com sucesso!\n");
+        printf("Login realizado com sucesso!\n\n");
         menu_cliente();
       } else {
         printf("Senha incorreta! Tente novamente.\n");
