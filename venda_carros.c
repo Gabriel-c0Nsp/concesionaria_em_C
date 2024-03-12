@@ -14,6 +14,8 @@ typedef struct {
 } Cliente;
 
 Cliente clientes[200];
+Cliente cliente_logado;
+int cliente_logado_index;
 int qtd_clientes = 0;
 
 typedef struct {
@@ -45,6 +47,7 @@ int excluir_carro(Estoque *estoque, char modelo[50]);
 void alterar_carro(Estoque *estoque, char modelo[50]);
 void exibir_clientes(void);
 void excluir_cliente(void);
+void alterar_cliente(void);
 
 // Função principal
 int main(void) {
@@ -135,6 +138,10 @@ int verificar_dados(char nome[50], char senha[200]) {
   for (int i = 0; i < qtd_clientes; i++) {
     if (strcmp(nome, clientes[i].nome) == 0 && strcasecmp(senha, clientes[i].senha) == 0) {
       achado = 1;
+
+      strcpy(cliente_logado.nome, nome);
+      strcpy(cliente_logado.senha, senha);
+      cliente_logado_index = i;
       break;
     }
   }
@@ -167,6 +174,7 @@ int login_vendedor(void) {
         valido = 1;
       } else {
         valido = 0;
+        clear_screen();
         printf("Senha incorreta! Tente novamente.\n");
       }
     } else if (opcao == 0) {
@@ -204,6 +212,7 @@ void login_cliente(void) {
         printf("Login realizado com sucesso!\n\n");
         menu_cliente();
       } else {
+        clear_screen();
         printf("Senha incorreta! Tente novamente.\n");
         menu_principal();
       }
@@ -236,15 +245,14 @@ void menu_vendedor(void) {
       printf("Exibir estoque: (5)\n");
       printf("Consultar vendas: (6)\n");
       printf("\n============ Referente aos clientes ============\n");
-      printf("Alterar Cliente: (7)\n");
-      printf("Excluir Cliente: (8)\n");
-      printf("Exibir Clientes: (9)\n");
+      printf("Excluir Cliente: (7)\n");
+      printf("Exibir Clientes: (8)\n");
       printf("\n============ Sair ============\n");
       printf("Sair: (0)\n");
       printf("\n-->  ");
       scanf("%d", &opcao);
 
-      if (opcao < 0 || opcao > 9) {
+      if (opcao < 0 || opcao > 8) {
         valido = 0;
         printf("Não é uma opção válida! Tente novamente.\n");
       } else if (opcao == 0) {
@@ -286,11 +294,11 @@ void menu_vendedor(void) {
         }
 
         excluir_carro(&estoque, modelo);
-      } else if (opcao == 8) {
-        excluir_cliente();
       } else if (opcao == 5) {
         exibir_estoque(estoque);
-      } else if (opcao == 9) {
+      } else if (opcao == 7) {
+        excluir_cliente();
+      } else if (opcao == 8) {
         exibir_clientes();
       } 
 
@@ -305,11 +313,12 @@ void menu_cliente(void) {
   do {
     printf("Pesquisar carros: (1)\n");
     printf("Comprar carro: (2)\n");
+    printf("Alterar informações do usuário: (3)\n");
     printf("Sair: (0)\n");
     printf("\n-->  ");
     scanf("%d", &opcao);
 
-    if (opcao < 0 || opcao > 2) {
+    if (opcao < 0 || opcao > 3) {
       valido = 0;
       printf("Não é uma opção válida! Tente novamente.\n");
     } else if (opcao == 1) {
@@ -320,6 +329,11 @@ void menu_cliente(void) {
 
       pesquisar_carro(estoque, modelo);
       printf("\n\n");
+    } else if (opcao == 3) {
+      alterar_cliente();
+    }  else if (opcao == 0) {
+      printf("Saindo...\n");
+      menu_principal();
     } else {
       valido = 1;
     }
@@ -442,6 +456,40 @@ void excluir_cliente(void) {
     printf("Cliente excluído com sucesso!\n");
   } else {
     printf("Cliente não encontrado!\n");
+  }
+}
+
+void alterar_cliente(void) {
+  char nome[50];
+  char senha[200];
+
+  int valido = 0;
+
+  printf("Insira o nome atual: ");
+  scanf("%s", nome);
+  printf("Insira a senha atual: ");
+  scanf("%s", senha);
+
+  clear_screen();
+
+  if (strcmp(nome, cliente_logado.nome) == 0 && strcmp(senha, cliente_logado.senha) == 0) {
+    printf("Insira o novo nome: ");
+    scanf("%s", cliente_logado.nome);
+    printf("Insira a nova senha: ");
+    scanf("%s", cliente_logado.senha);
+
+    valido = 1;
+  } else {
+    clear_screen();
+    printf("Senha incorreta! Tente novamente.\n");
+  }
+
+  if (valido) {
+    strcpy(clientes[cliente_logado_index].nome, cliente_logado.nome);
+    strcpy(clientes[cliente_logado_index].senha, cliente_logado.senha);
+
+    clear_screen();
+    printf("Informações alteradas com sucesso!\n");
   }
 }
 
