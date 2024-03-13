@@ -8,6 +8,9 @@ typedef struct {
   double preco;
 } Carro;
 
+Carro carros_encomendados[200];
+int qtd_carros_encomendados = 0;
+
 typedef struct {
   char nome[50];
   char senha[200];
@@ -25,6 +28,12 @@ typedef struct {
 } Vendedor;
 
 typedef struct {
+  char nome_cliente[50];
+  char modelo[50];
+  double preco;
+} Venda;
+
+typedef struct {
   Carro carros_estoque[200];
   int qtd_carros;
 } Estoque;
@@ -32,7 +41,7 @@ typedef struct {
 Estoque estoque;
 
 // Funções
-void clear_screen(void);
+void limpa_tela(void);
 void menu_principal(void);
 void menu_cliente(void);
 void menu_vendedor(void);
@@ -48,10 +57,12 @@ void alterar_carro(Estoque *estoque, char modelo[50]);
 void exibir_clientes(void);
 void excluir_cliente(void);
 void alterar_cliente(void);
+void realizar_venda(void);
+void consultar_vendas(void);
 
 // Função principal
 int main(void) {
-  clear_screen();
+  limpa_tela();
 
   menu_principal();
 
@@ -66,7 +77,7 @@ void menu_principal(void) {
     printf("Insira o tipo de usuário: \n(1) Cliente \n(2) Vendedor \n(0) Sair\n");
     printf("\n-->  ");
     scanf("%d", &tipo_usuario);
-    clear_screen();
+    limpa_tela();
     
     if (tipo_usuario < 0 || tipo_usuario > 2) {
       valido = 0;
@@ -74,7 +85,6 @@ void menu_principal(void) {
     } else {
       valido = 1;
     }
-
   } while (!valido);
 
   switch (tipo_usuario) {
@@ -122,12 +132,12 @@ void cadastrar_cliente(void) {
     strcpy(clientes[qtd_clientes - 1].nome, nome);
     strcpy(clientes[qtd_clientes - 1].senha, senha);
 
-    clear_screen();
+    limpa_tela();
     printf("Cadastro realizado com sucesso!\n\n");
 
     menu_principal();
   } else if (opcao == 0) {
-    clear_screen();
+    limpa_tela();
     login_cliente();
   }
 }
@@ -161,7 +171,7 @@ int login_vendedor(void) {
     printf("Sair (0)\n");
     printf("\n-->  ");
     scanf("%d", &opcao);
-    clear_screen();
+    limpa_tela();
 
     if (opcao < 0 || opcao > 1) {
       valido = 0;
@@ -174,7 +184,7 @@ int login_vendedor(void) {
         valido = 1;
       } else {
         valido = 0;
-        clear_screen();
+        limpa_tela();
         printf("Senha incorreta! Tente novamente.\n");
       }
     } else if (opcao == 0) {
@@ -184,7 +194,7 @@ int login_vendedor(void) {
 
   } while (!valido);
 
-  clear_screen();
+  limpa_tela();
   return valido;
 }
 
@@ -208,11 +218,11 @@ void login_cliente(void) {
       printf("Insira a sua senha: ");
       scanf("%s", senha);
       if (verificar_dados(nome, senha)) {
-        clear_screen();
+        limpa_tela();
         printf("Login realizado com sucesso!\n\n");
         menu_cliente();
       } else {
-        clear_screen();
+        limpa_tela();
         printf("Senha incorreta! Tente novamente.\n");
         menu_principal();
       }
@@ -265,7 +275,7 @@ void menu_vendedor(void) {
         scanf("%s", carro.modelo);
         printf("Insira o preço do carro: ");
         scanf("%lf", &carro.preco);
-        clear_screen();
+        limpa_tela();
 
         inserir_carro(&estoque, carro);
       } else if (opcao == 2) {
@@ -296,6 +306,8 @@ void menu_vendedor(void) {
         excluir_carro(&estoque, modelo);
       } else if (opcao == 5) {
         exibir_estoque(estoque);
+      } else if (opcao == 6) {
+        consultar_vendas();
       } else if (opcao == 7) {
         excluir_cliente();
       } else if (opcao == 8) {
@@ -329,9 +341,11 @@ void menu_cliente(void) {
 
       pesquisar_carro(estoque, modelo);
       printf("\n\n");
+    } else if (opcao == 2) {
+      realizar_venda();
     } else if (opcao == 3) {
       alterar_cliente();
-    }  else if (opcao == 0) {
+    } else if (opcao == 0) {
       printf("Saindo...\n");
       menu_principal();
     } else {
@@ -348,7 +362,7 @@ void inserir_carro(Estoque *estoque, Carro carro) {
 }
 
 void exibir_estoque(Estoque estoque) {
-  clear_screen();
+  limpa_tela();
 
   int achado = 0;
 
@@ -366,7 +380,7 @@ void exibir_estoque(Estoque estoque) {
 
 // Buscar carro
 void pesquisar_carro(Estoque estoque, char modelo[50]) {
-  clear_screen();
+  limpa_tela();
 
   int achado = 0;
 
@@ -411,20 +425,20 @@ void alterar_carro(Estoque *estoque, char modelo[50]) {
       scanf("%lf", &estoque -> carros_estoque[i].preco);
       achado = 1;
 
-      clear_screen();
+      limpa_tela();
       printf("Carro alterado com sucesso!\n");
     }
   }
 
   if (!achado) {
-    clear_screen();
+    limpa_tela();
     printf("Carro não encontrado!\n");
   }
 }
 
 // Lista os clientes cadastrados
 void exibir_clientes(void) {
-  clear_screen();
+  limpa_tela();
 
   printf("CLIENTES CADASTRADOS:\n");
 
@@ -440,7 +454,7 @@ void excluir_cliente(void) {
   printf("Insira o nome do cliente que deseja excluir: ");
   scanf("%s", nome);
 
-  clear_screen();
+  limpa_tela();
 
   for (int i = 0; i < qtd_clientes; i++) {
     if (strcmp(nome, clientes[i].nome) == 0) {
@@ -470,7 +484,7 @@ void alterar_cliente(void) {
   printf("Insira a senha atual: ");
   scanf("%s", senha);
 
-  clear_screen();
+  limpa_tela();
 
   if (strcmp(nome, cliente_logado.nome) == 0 && strcmp(senha, cliente_logado.senha) == 0) {
     printf("Insira o novo nome: ");
@@ -480,7 +494,7 @@ void alterar_cliente(void) {
 
     valido = 1;
   } else {
-    clear_screen();
+    limpa_tela();
     printf("Senha incorreta! Tente novamente.\n");
   }
 
@@ -488,13 +502,61 @@ void alterar_cliente(void) {
     strcpy(clientes[cliente_logado_index].nome, cliente_logado.nome);
     strcpy(clientes[cliente_logado_index].senha, cliente_logado.senha);
 
-    clear_screen();
+    limpa_tela();
     printf("Informações alteradas com sucesso!\n");
   }
 }
 
+void realizar_venda(void) {
+  char modelo[50];
+  int achado = 0;
+  int opcao = 0;
+
+  printf("Insira o modelo do carro que deseja comprar: ");
+  scanf("%s", modelo);
+
+  for (int i = 0; i < estoque.qtd_carros; i++) {
+    if (strcmp(modelo, estoque.carros_estoque[i].modelo) == 0) {
+      achado = 1;
+
+      limpa_tela();
+      printf("o carro %s está disponível por R$%.2lf\n", estoque.carros_estoque[i].modelo, estoque.carros_estoque[i].preco);
+      printf("Deseja comprar? (1) Sim (0) Não\n");
+      printf("\n-->  ");
+      scanf("%d", &opcao);
+
+      if (opcao == 1) {
+        limpa_tela();
+        printf("Compra realizada com sucesso!\n");
+
+        excluir_carro(&estoque, modelo);
+
+      } else {
+        limpa_tela();
+        printf("Compra cancelada!\n");
+      }
+      break;
+    }
+  }
+
+  if (achado == 0) {
+    limpa_tela();
+    printf("O carro %s não está disponível no momento\n", modelo);
+
+    strcpy(carros_encomendados[qtd_carros_encomendados].modelo, modelo);
+  }
+}
+
+void consultar_vendas(void) {
+  limpa_tela();
+
+  printf("VENDAS REALIZADAS:\n");
+
+  // TODO: Implementar a lógica para exibir strutura de vendas
+}
+
 // Função para limpar a tela independente do sistema operacional 
-void clear_screen(void) {
+void limpa_tela(void) {
 #ifdef _WIN32
   system("cls");
 #else
