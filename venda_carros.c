@@ -20,6 +20,8 @@ typedef struct {
 // Variáveis globais relacionadas aos clientes
 Cliente clientes[200];
 Cliente cliente_logado;
+Cliente cliente_fila_espera[200]; // Clientes que reservaram um carro
+int qtd_clientes_fila_espera = 0;
 int cliente_logado_index;
 int qtd_clientes = 0;
 
@@ -366,10 +368,27 @@ void menu_cliente(void) {
 
 // Adiciona um carro no estoque
 void inserir_carro(Estoque *estoque, Carro carro) {
-  estoque -> carros_estoque[estoque -> qtd_carros] = carro;
-  estoque -> qtd_carros++;
+  for (int i = 0; i < qtd_carros_encomendados; i++) {
+    if (strcmp(carro.modelo, carros_encomendados[i].modelo) == 0) {
+      for (int j = i; j < qtd_carros_encomendados; j++) {
+        carros_encomendados[j] = carros_encomendados[j + 1];
+      }
+      printf("O carro %s estava na lista de encomendas. A venda foi realizada automaticamente!\n", carro.modelo);
 
-  printf("\nCarro inserido com sucesso!\n");
+      Venda venda;
+      strcpy(venda.nome_cliente, cliente_fila_espera[i].nome);
+      strcpy(venda.modelo, carro.modelo);
+      venda.preco = carro.preco;
+
+      registrar_venda(&venda);
+      qtd_carros_encomendados--;
+    } else {
+      estoque -> carros_estoque[estoque -> qtd_carros] = carro;
+      estoque -> qtd_carros++;
+
+      printf("\nCarro inserido com sucesso!\n");
+    }
+  }
 }
 
 void exibir_estoque(Estoque estoque) {
@@ -583,6 +602,8 @@ void realizar_venda(void) {
         printf("Encomenda realizada com sucesso!\n\n");
         strcpy(carros_encomendados[qtd_carros_encomendados].modelo, modelo);
         qtd_carros_encomendados++;
+        strcpy(cliente_fila_espera[qtd_clientes_fila_espera].nome, cliente_logado.nome);
+        qtd_clientes_fila_espera++;
 
         valido = 1;
       } else if (opcao == 0) {
@@ -617,7 +638,7 @@ void consultar_vendas(void) {
     printf("Nome do cliente: %s\n", vendas[i].nome_cliente);
     printf("Modelo do carro: %s\n", vendas[i].modelo);
     printf("Preço: R$%.2lf\n", vendas[i].preco);
-    printf("------------------\n");
+    printf("------------------");
   }
 
   printf("\n\nTotal de vendas realizadas: %d\n", qtd_vendas);
