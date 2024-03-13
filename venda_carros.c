@@ -8,6 +8,7 @@ typedef struct {
   double preco;
 } Carro;
 
+// Variáveis globais relacionadas à venda de carros
 Carro carros_encomendados[200];
 int qtd_carros_encomendados = 0;
 
@@ -16,6 +17,7 @@ typedef struct {
   char senha[200];
 } Cliente;
 
+// Variáveis globais relacionadas aos clientes
 Cliente clientes[200];
 Cliente cliente_logado;
 int cliente_logado_index;
@@ -33,6 +35,7 @@ typedef struct {
   double preco;
 } Venda;
 
+// Variáveis globais relacionadas às vendas
 Venda vendas[200];
 int qtd_vendas = 0;
 double renda_total = 0;
@@ -42,6 +45,7 @@ typedef struct {
   int qtd_carros;
 } Estoque;
 
+// Variáveis globais relacionadas ao estoque
 Estoque estoque;
 
 // Funções
@@ -364,6 +368,8 @@ void menu_cliente(void) {
 void inserir_carro(Estoque *estoque, Carro carro) {
   estoque -> carros_estoque[estoque -> qtd_carros] = carro;
   estoque -> qtd_carros++;
+
+  printf("\nCarro inserido com sucesso!\n");
 }
 
 void exibir_estoque(Estoque estoque) {
@@ -516,6 +522,7 @@ void realizar_venda(void) {
   char modelo[50];
   int achado = 0;
   int opcao = 0;
+  int valido = 0;
 
   printf("Insira o modelo do carro que deseja comprar: ");
   scanf("%s", modelo);
@@ -530,23 +537,33 @@ void realizar_venda(void) {
       printf("\n-->  ");
       scanf("%d", &opcao);
 
-      if (opcao == 1) {
-        limpa_tela();
-        printf("Compra realizada com sucesso!\n");
+      while (!valido) {
+        if (opcao == 1) {
+          limpa_tela();
+          printf("Compra realizada com sucesso!\n\n");
 
-        double preco = estoque.carros_estoque[i].preco;
+          double preco = estoque.carros_estoque[i].preco;
 
-        excluir_carro(&estoque, modelo);
+          excluir_carro(&estoque, modelo);
 
-        Venda venda;
-        strcpy(venda.nome_cliente, cliente_logado.nome);
-        strcpy(venda.modelo, modelo);
-        venda.preco = preco; 
+          Venda venda;
+          strcpy(venda.nome_cliente, cliente_logado.nome);
+          strcpy(venda.modelo, modelo);
+          venda.preco = preco; 
 
-        registrar_venda(&venda);
-      } else {
-        limpa_tela();
-        printf("Compra cancelada!\n");
+          registrar_venda(&venda);
+          valido = 1;
+          break;
+        } else if (opcao == 0) {
+          limpa_tela();
+          printf("Compra cancelada!\n\n");
+          valido = 1;
+          break;
+        } else {
+          printf("Não é uma opção válida! Tente novamente.\n");
+          printf("\n-->  ");
+          scanf("%d", &opcao);
+        }
       }
       break;
     }
@@ -555,9 +572,30 @@ void realizar_venda(void) {
   if (achado == 0) {
     limpa_tela();
     printf("O carro %s não está disponível no momento\n", modelo);
-    printf("O seu carro foi adicionado à lista de encomendas\n");
 
-    strcpy(carros_encomendados[qtd_carros_encomendados].modelo, modelo);
+    printf("Deseja encomendar? (1) Sim (0) Não\n");
+    printf("\n-->  ");
+    scanf("%d", &opcao);
+
+    while (!valido) {
+      if (opcao == 1) {
+        limpa_tela();
+        printf("Encomenda realizada com sucesso!\n\n");
+        strcpy(carros_encomendados[qtd_carros_encomendados].modelo, modelo);
+        qtd_carros_encomendados++;
+
+        valido = 1;
+      } else if (opcao == 0) {
+        limpa_tela();
+        printf("Compra cancelada!\n");
+
+        valido = 1;
+      } else {
+        printf("Não é uma opção válida! Tente novamente.\n");
+        printf("\n-->  ");
+        scanf("%d", &opcao);
+      }
+    }
   }
 }
 
