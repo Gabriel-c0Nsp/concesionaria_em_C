@@ -70,6 +70,7 @@ void alterar_cliente(void);
 void realizar_venda(void);
 void registrar_venda(Venda *venda);
 void consultar_vendas(void);
+void realizar_cadastro(void);
 
 // Função principal
 int main(void) {
@@ -112,9 +113,6 @@ void menu_principal(void) {
 }
 
 void cadastrar_cliente(void) {
-  char nome[50];
-  char senha[200];
-
   int opcao = 0;
   int valido = 0;
 
@@ -132,24 +130,15 @@ void cadastrar_cliente(void) {
     }
   } while (!valido);
 
-  if (opcao == 1) {
-    printf("Insira o seu nome: ");
-    scanf("%49s", nome);
-    printf("Escolha uma senha: ");
-    scanf("%199s", senha); 
-    qtd_clientes++;
-
-    // Armazena o novo cliente no array clientes
-    strcpy(clientes[qtd_clientes - 1].nome, nome);
-    strcpy(clientes[qtd_clientes - 1].senha, senha);
-
-    limpa_tela();
-    printf("Cadastro realizado com sucesso!\n\n");
-
-    menu_principal();
-  } else if (opcao == 0) {
-    limpa_tela();
-    login_cliente();
+  switch (opcao) {
+    case 1:
+      realizar_cadastro();
+      menu_principal();
+      break;
+    case 0:
+      limpa_tela();
+      login_cliente();
+      break;
   }
 }
 
@@ -169,7 +158,6 @@ int verificar_dados(char nome[50], char senha[200]) {
 
   return achado;
 }
-
 
 int login_vendedor(void) {
   int opcao = 0;
@@ -202,7 +190,6 @@ int login_vendedor(void) {
       printf("Saindo...\n");
       menu_principal();
     }
-
   } while (!valido);
 
   limpa_tela();
@@ -248,7 +235,6 @@ void login_cliente(void) {
       printf("Não é uma opção válida! Tente novamente.\n");
       valido = 0;
     }
-
   } while (!valido);
 }
 
@@ -362,7 +348,6 @@ void menu_cliente(void) {
     } else {
       valido = 1;
     }
-
   } while (!valido);
 }
 
@@ -643,6 +628,24 @@ void consultar_vendas(void) {
 
   printf("\n\nTotal de vendas realizadas: %d\n", qtd_vendas);
   printf("Renda total: R$%.2lf\n", renda_total);
+}
+
+void realizar_cadastro(void) {
+  char nome[50];
+  char senha[200];
+
+  printf("Insira o seu nome: ");
+  scanf("%s", nome); 
+  printf("Escolha uma senha: ");
+  scanf("%s", senha);
+  qtd_clientes++;
+
+  // Armazena o novo cliente no array clientes
+  strcpy(clientes[qtd_clientes - 1].nome, nome);
+  strcpy(clientes[qtd_clientes - 1].senha, senha);
+
+  limpa_tela();
+  printf("Cadastro realizado com sucesso!\n\n");
 }
 
 // Função para limpar a tela independente do sistema operacional 
