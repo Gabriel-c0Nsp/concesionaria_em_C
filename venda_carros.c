@@ -33,6 +33,10 @@ typedef struct {
   double preco;
 } Venda;
 
+Venda vendas[200];
+int qtd_vendas = 0;
+double renda_total = 0;
+
 typedef struct {
   Carro carros_estoque[200];
   int qtd_carros;
@@ -58,6 +62,7 @@ void exibir_clientes(void);
 void excluir_cliente(void);
 void alterar_cliente(void);
 void realizar_venda(void);
+void registrar_venda(Venda *venda);
 void consultar_vendas(void);
 
 // Função principal
@@ -529,8 +534,16 @@ void realizar_venda(void) {
         limpa_tela();
         printf("Compra realizada com sucesso!\n");
 
+        double preco = estoque.carros_estoque[i].preco;
+
         excluir_carro(&estoque, modelo);
 
+        Venda venda;
+        strcpy(venda.nome_cliente, cliente_logado.nome);
+        strcpy(venda.modelo, modelo);
+        venda.preco = preco; 
+
+        registrar_venda(&venda);
       } else {
         limpa_tela();
         printf("Compra cancelada!\n");
@@ -542,9 +555,18 @@ void realizar_venda(void) {
   if (achado == 0) {
     limpa_tela();
     printf("O carro %s não está disponível no momento\n", modelo);
+    printf("O seu carro foi adicionado à lista de encomendas\n");
 
     strcpy(carros_encomendados[qtd_carros_encomendados].modelo, modelo);
   }
+}
+
+void registrar_venda(Venda *venda) {
+  strcpy(vendas[qtd_vendas].nome_cliente, venda -> nome_cliente);
+  strcpy(vendas[qtd_vendas].modelo, venda -> modelo);
+  vendas[qtd_vendas].preco = venda -> preco;
+  renda_total += venda -> preco; 
+  qtd_vendas++; 
 }
 
 void consultar_vendas(void) {
@@ -552,7 +574,16 @@ void consultar_vendas(void) {
 
   printf("VENDAS REALIZADAS:\n");
 
-  // TODO: Implementar a lógica para exibir strutura de vendas
+  for (int i = 0; i < qtd_vendas; i++) {
+    printf("\n------------------\n");
+    printf("Nome do cliente: %s\n", vendas[i].nome_cliente);
+    printf("Modelo do carro: %s\n", vendas[i].modelo);
+    printf("Preço: R$%.2lf\n", vendas[i].preco);
+    printf("------------------\n");
+  }
+
+  printf("\n\nTotal de vendas realizadas: %d\n", qtd_vendas);
+  printf("Renda total: R$%.2lf\n", renda_total);
 }
 
 // Função para limpar a tela independente do sistema operacional 
